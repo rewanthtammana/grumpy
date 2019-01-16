@@ -65,7 +65,7 @@ kind: ValidatingWebhookConfiguration
 metadata:
   name: grumpy
 webhooks:
-  - name: grumpy.giantswarm.io
+  - name: grumpy-webhook
     clientConfig:
       service:
         name: grumpy
