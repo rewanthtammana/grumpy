@@ -14,7 +14,7 @@ spec:
   selector:
     name: grumpy 
 ---
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: grumpy
@@ -22,6 +22,9 @@ metadata:
   labels:
     name: grumpy
 spec:
+  selector:
+    matchLabels:
+      name: grumpy
   replicas: 1
   template:
     metadata:
