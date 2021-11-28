@@ -49,7 +49,7 @@ func (gs *GrumpyServerHandler) serve(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Printf("Pod image = %v\n", pod)
+	fmt.Printf("Podx image = %v\n", pod)
 
 	// app := "./notary"
 	// subcommand = "lookup"
@@ -66,6 +66,10 @@ func (gs *GrumpyServerHandler) serve(w http.ResponseWriter, r *http.Request) {
     //     return
     // }
 
+
+	for i := 0; i < len(pod.Spec.Containers); i++ {
+		fmt.Println("=====> ", pod.Spec.Containers[i].Image)
+	}
     // // Print the output
     // fmt.Println(string(stdout))
 
