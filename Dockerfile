@@ -13,7 +13,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -ldflags '-extldflags "-static"' -o gru
 
 FROM scratch
 COPY --from=build-env /go/src/github.com/testinguser883/grumpy/grumpywebhook .
-COPY --from=build-env /go/src/github.com/testinguser883/grumpy/test /usr/local/bin
+COPY --from=build-env /go/src/github.com/testinguser883/grumpy/notary-slim .
 COPY --from=build-env /etc/passwd /etc/passwd
 USER webhook
 ENTRYPOINT ["/grumpywebhook"]
