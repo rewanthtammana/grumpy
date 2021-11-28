@@ -49,7 +49,9 @@ func (gs *GrumpyServerHandler) serve(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println("Pod image = ", pod)
+	fmt.Printf("Pod image = %v\n", pod)
+
+
 
 	if pod.Name == "smooth-app" {
 		return
