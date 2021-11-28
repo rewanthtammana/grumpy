@@ -1,4 +1,8 @@
 # build stage
+
+# docker build . -t rewanthtammana/grumpy:nonscratch
+# docker push rewanthtammana/grumpy:nonscratch
+
 FROM golang:1.10-stretch AS build-env
 RUN mkdir -p /go/src/github.com/testinguser883/grumpy
 WORKDIR /go/src/github.com/testinguser883/grumpy
@@ -9,7 +13,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -ldflags '-extldflags "-static"' -o gru
 
 FROM scratch
 COPY --from=build-env /go/src/github.com/testinguser883/grumpy/grumpywebhook .
-COPY --from=build-env /go/src/github.com/testinguser883/grumpy/test .
+COPY --from=build-env /go/src/github.com/testinguser883/grumpy/test /usr/local/bin
 COPY --from=build-env /etc/passwd /etc/passwd
 USER webhook
 ENTRYPOINT ["/grumpywebhook"]

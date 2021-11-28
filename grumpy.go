@@ -51,7 +51,23 @@ func (gs *GrumpyServerHandler) serve(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Printf("Pod image = %v\n", pod)
 
+	// app := "./notary"
 
+    // arg0 := "-s"
+    // arg1 := os.Getenv("NOTARY_SERVER")
+    // arg2 := os.Getenv("GUN")
+    // arg3 := os.Getenv("TARGET")
+
+    // cmd := exec.Command(app, arg0, arg1, arg2, arg3)
+    // stdout, err := cmd.Output()
+
+    // if err != nil {
+    //     fmt.Println(err.Error())
+    //     return
+    // }
+
+    // // Print the output
+    // fmt.Println(string(stdout))
 
 	if pod.Name == "smooth-app" {
 		return
