@@ -1,5 +1,5 @@
-docker build . -t rewanthtammana/grumpy
-docker push rewanthtammana/grumpy
+# docker build . -t rewanthtammana/grumpy
+# docker push rewanthtammana/grumpy
 
 kubectl delete secret grumpy
 
