@@ -48,6 +48,9 @@ func (gs *GrumpyServerHandler) serve(w http.ResponseWriter, r *http.Request) {
 		glog.Error("error deserializing pod")
 		return
 	}
+
+	fmt.Println("Pod image = ", pod)
+
 	if pod.Name == "smooth-app" {
 		return
 	}
