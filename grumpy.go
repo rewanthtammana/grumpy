@@ -3,8 +3,11 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"os"
+	
 	"io/ioutil"
 	"net/http"
+	"os/exec"
 
 	"github.com/golang/glog"
 	"k8s.io/api/admission/v1beta1"
@@ -51,27 +54,27 @@ func (gs *GrumpyServerHandler) serve(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Printf("Podx image = %v\n", pod)
 
-	// app := "./notary"
-	// subcommand = "lookup"
-    // arg0 := "-s"
-    // arg1 := os.Getenv("NOTARY_SERVER")
-    // arg2 := os.Getenv("GUN")
-    // arg3 := os.Getenv("TARGET")
-
-    // cmd := exec.Command(app, subcommand, arg0, arg1, arg2, arg3)
-    // stdout, err := cmd.Output()
-
-    // if err != nil {
-    //     fmt.Println(err.Error())
-    //     return
-    // }
-
-
 	for i := 0; i < len(pod.Spec.Containers); i++ {
 		fmt.Println("=====> ", pod.Spec.Containers[i].Image)
 	}
-    // // Print the output
-    // fmt.Println(string(stdout))
+
+	app := "./notary-slim"
+	subcommand := "lookup"
+    arg0 := "-s"
+    arg1 := os.Getenv("NOTARY_SERVER")
+    arg2 := os.Getenv("GUN")
+    arg3 := os.Getenv("TARGET")
+
+    cmd := exec.Command(app, subcommand, arg0, arg1, arg2, arg3)
+    stdout, err := cmd.Output()
+
+    if err != nil {
+        fmt.Println(err.Error())
+        return
+    }
+
+    // Print the output
+    fmt.Println(string(stdout))
 
 	if pod.Name == "smooth-app" {
 		return
