@@ -43,7 +43,7 @@ spec:
     spec:
       containers:
         - name: webhook
-          image: rewanthtammana/grumpy
+          image: rewanthtammana/grumpy:nonscratch
           # image: pipo02mix/grumpy:1.0.0
           imagePullPolicy: Always
           args:
