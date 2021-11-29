@@ -13,6 +13,15 @@ spec:
     targetPort: 8080
   selector:
     name: grumpy 
+# ---
+# apiVersion: v1
+# data:
+#   ca.crt: <BASE64>
+#   config.json: <BASE64>
+# kind: Secret
+# metadata:
+#   creationTimestamp: null
+#   name: notary-auth
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -53,11 +62,17 @@ spec:
             - name: webhook-certs
               mountPath: /etc/certs
               readOnly: true
+            # - name: notary-auth
+            #   mountPath: /home/webhook/.notary
+            #   readOnly: true
             - name: logs
               mountPath: /tmp
           securityContext:
             readOnlyRootFilesystem: true
       volumes:
+        # - name: webhook-certs
+        #   secret:
+        #     secretName: notary-auth
         - name: webhook-certs
           secret:
             secretName: grumpy
