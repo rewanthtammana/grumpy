@@ -3,11 +3,11 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"os"
-	
+	// "os"
+
 	"io/ioutil"
 	"net/http"
-	"os/exec"
+	// "os/exec"
 
 	"github.com/golang/glog"
 	"k8s.io/api/admission/v1beta1"
@@ -46,35 +46,46 @@ func (gs *GrumpyServerHandler) serve(w http.ResponseWriter, r *http.Request) {
 	}
 
 	raw := arRequest.Request.Object.Raw
+	admissionRequestUID := arRequest.Request.UID
+	glog.Info("admissionRequestUID")
+	glog.Info(admissionRequestUID)
+	
 	pod := v1.Pod{}
 	if err := json.Unmarshal(raw, &pod); err != nil {
 		glog.Error("error deserializing pod")
 		return
 	}
+	podName := fmt.Sprintf("Pod name = %s\n", pod.Name)
+	glog.Info("podName")
+	glog.Info(podName)
+	podInfo := fmt.Sprintf(">>>> Podx image = %v\n", pod)
+	glog.Info("PodInfo")
+	glog.Info(podInfo)
+	podUID := fmt.Sprintf("Pod name = %s\n", pod.UID)
+	glog.Info("PodUID")
+	glog.Info(podUID)
 
-	fmt.Printf("Podx image = %v\n", pod)
+	// for i := 0; i < len(pod.Spec.Containers); i++ {
+	// 	fmt.Println("=====> ", pod.Spec.Containers[i].Image)
+	// }
 
-	for i := 0; i < len(pod.Spec.Containers); i++ {
-		fmt.Println("=====> ", pod.Spec.Containers[i].Image)
-	}
+	// app := "./notary-slim"
+	// subcommand := "lookup"
+    // arg0 := "-s"
+    // arg1 := os.Getenv("NOTARY_SERVER")
+    // arg2 := os.Getenv("GUN")
+    // arg3 := os.Getenv("TARGET")
 
-	app := "./notary-slim"
-	subcommand := "lookup"
-    arg0 := "-s"
-    arg1 := os.Getenv("NOTARY_SERVER")
-    arg2 := os.Getenv("GUN")
-    arg3 := os.Getenv("TARGET")
+    // cmd := exec.Command(app, subcommand, arg0, arg1, arg2, arg3)
+    // stdout, err := cmd.Output()
 
-    cmd := exec.Command(app, subcommand, arg0, arg1, arg2, arg3)
-    stdout, err := cmd.Output()
+    // if err != nil {
+    //     fmt.Println(err.Error())
+    //     return
+    // }
 
-    if err != nil {
-        fmt.Println(err.Error())
-        return
-    }
-
-    // Print the output
-    fmt.Println(string(stdout))
+    // // Print the output
+    // fmt.Println(string(stdout))
 
 	if pod.Name == "smooth-app" {
 		return
@@ -82,20 +93,48 @@ func (gs *GrumpyServerHandler) serve(w http.ResponseWriter, r *http.Request) {
 
 	arResponse := v1beta1.AdmissionReview{
 		Response: &v1beta1.AdmissionResponse{
+			UID: admissionRequestUID,
 			Allowed: false,
 			Result: &metav1.Status{
 				Message: "Keep calm and not add more crap in the cluster!",
 			},
 		},
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: "admission.k8s.io/v1",
+			Kind:       "AdmissionReview",
+		},
 	}
+
+	arResponseDebug := fmt.Sprintf(">>>> Podx image = %v\n", arResponse)
+	glog.Info("arResponseDebug")
+	glog.Info(arResponseDebug)
+
 	resp, err := json.Marshal(arResponse)
+	
+	// type respArr struct {
+	// 	ApiVersion string
+	// 	Kind string
+	// 	Response *v1beta1.AdmissionReview
+	// }
+	// respUpdate := &respArr{
+	// 	ApiVersion: "admission.k8s.io/v1",
+	// 	Kind: "AdmissionReview",
+	// 	Response: &arResponse,
+	// }
+	// respUpdateJson, _ := json.Marshal(respUpdate)
+
 	if err != nil {
 		glog.Errorf("Can't encode response: %v", err)
 		http.Error(w, fmt.Sprintf("could not encode response: %v", err), http.StatusInternalServerError)
 	}
+	glog.Info("resp")
+	glog.Info(string(resp))
 	glog.Infof("Ready to write reponse ...")
 	if _, err := w.Write(resp); err != nil {
+	// if _, err := w.Write(respUpdateJson); err != nil {
 		glog.Errorf("Can't write response: %v", err)
 		http.Error(w, fmt.Sprintf("could not write response: %v", err), http.StatusInternalServerError)
 	}
+	glog.Info("resp-end")
+	glog.Info(string(resp))
 }
