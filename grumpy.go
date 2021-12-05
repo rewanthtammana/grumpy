@@ -10,7 +10,7 @@ import (
 	// "os/exec"
 
 	"github.com/golang/glog"
-	"k8s.io/api/admission/v1"
+	"k8s.io/api/admission/v1beta1"
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -39,7 +39,7 @@ func (gs *GrumpyServerHandler) serve(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	arRequest := v1.AdmissionReview{}
+	arRequest := v1beta1.AdmissionReview{}
 	if err := json.Unmarshal(body, &arRequest); err != nil {
 		glog.Error("incorrect body")
 		http.Error(w, "incorrect body", http.StatusBadRequest)
@@ -91,8 +91,8 @@ func (gs *GrumpyServerHandler) serve(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	arResponse := v1.AdmissionReview{
-		Response: &v1.AdmissionResponse{
+	arResponse := v1beta1.AdmissionReview{
+		Response: &v1beta1.AdmissionResponse{
 			UID: admissionRequestUID,
 			Allowed: false,
 			Result: &metav1.Status{
@@ -114,7 +114,7 @@ func (gs *GrumpyServerHandler) serve(w http.ResponseWriter, r *http.Request) {
 	// type respArr struct {
 	// 	ApiVersion string
 	// 	Kind string
-	// 	Response *v1.AdmissionReview
+	// 	Response *v1beta1.AdmissionReview
 	// }
 	// respUpdate := &respArr{
 	// 	ApiVersion: "admission.k8s.io/v1",

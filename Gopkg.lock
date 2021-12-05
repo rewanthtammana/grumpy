@@ -107,17 +107,6 @@
   revision = "12444147eb1150aa5c80d2aae532cbc5b7be73d0"
 
 [[projects]]
-  branch = "master"
-  name = "k8s.io/api"
-  packages = [
-    "admission/v1",
-    "admissionregistration/v1",
-    "authentication/v1",
-    "core/v1"
-  ]
-  revision = "ece165cac088f95a08701a0fdeb9f4ef36843524"
-
-[[projects]]
   branch = "release-1.10"
   name = "k8s.io/apimachinery"
   packages = [
