@@ -3,11 +3,12 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	// "os"
+	"os"
+	"strings"
 
 	"io/ioutil"
 	"net/http"
-	// "os/exec"
+	"os/exec"
 
 	"github.com/golang/glog"
 	"k8s.io/api/admission/v1beta1"
@@ -65,27 +66,35 @@ func (gs *GrumpyServerHandler) serve(w http.ResponseWriter, r *http.Request) {
 	glog.Info("PodUID")
 	glog.Info(podUID)
 
-	// for i := 0; i < len(pod.Spec.Containers); i++ {
-	// 	fmt.Println("=====> ", pod.Spec.Containers[i].Image)
-	// }
+	// var containerName string
+	app := "./notary-slim"
+	subcommand := "lookup"
+	arg0 := "-s"
+	arg1 := os.Getenv("NOTARY_SERVER")
 
-	// app := "./notary-slim"
-	// subcommand := "lookup"
-    // arg0 := "-s"
-    // arg1 := os.Getenv("NOTARY_SERVER")
-    // arg2 := os.Getenv("GUN")
-    // arg3 := os.Getenv("TARGET")
+	for i := 0; i < len(pod.Spec.Containers); i++ {
+		imageName := pod.Spec.Containers[i].Image
 
-    // cmd := exec.Command(app, subcommand, arg0, arg1, arg2, arg3)
-    // stdout, err := cmd.Output()
+		glog.Infof("===> Pod name = %s ; Container name = %s\n", podName, imageName)
 
-    // if err != nil {
-    //     fmt.Println(err.Error())
-    //     return
-    // }
+		// arg2 := os.Getenv("GUN")
+		// arg3 := os.Getenv("TARGET")
+		gun := strings.Split(imageName, ":")[0]
+		target := strings.Split(imageName, ":")[1]
 
-    // // Print the output
-    // fmt.Println(string(stdout))
+		cmd := exec.Command(app, subcommand, arg0, arg1, gun, target)
+		stdout, err := cmd.Output()
+
+		if err != nil {
+			glog.Errorf("Notary error = %v\n", err)
+			return
+		}
+
+		// Print the output
+		glog.Infof("--- Notary output for %s\n", imageName)
+		glog.Infof("+++ %v\n", string(stdout))
+		fmt.Println(string(stdout))
+	}
 
 	if pod.Name == "smooth-app" {
 		return
