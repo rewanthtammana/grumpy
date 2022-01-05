@@ -13,6 +13,15 @@ spec:
     targetPort: 8080
   selector:
     name: grumpy 
+# ---
+# apiVersion: v1
+# data:
+#   ca.crt: <BASE64>
+#   config.json: <BASE64>
+# kind: Secret
+# metadata:
+#   creationTimestamp: null
+#   name: notary-auth
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -22,10 +31,10 @@ metadata:
   labels:
     name: grumpy
 spec:
-  replicas: 1
   selector:
     matchLabels:
       name: grumpy
+  replicas: 1
   template:
     metadata:
       name: grumpy 
@@ -34,7 +43,8 @@ spec:
     spec:
       containers:
         - name: webhook
-          image: pipo02mix/grumpy:1.0.1
+          image: rewanthtammana/grumpy:nonscratch
+          # image: pipo02mix/grumpy:1.0.0
           imagePullPolicy: Always
           args:
             - -alsologtostderr
@@ -44,26 +54,32 @@ spec:
           resources:
             limits:
               memory: 50Mi
-              cpu: 300m
+              # cpu: 300m
             requests:
               memory: 00Mi
-              cpu: 300m
+              # cpu: 300m
           volumeMounts:
             - name: webhook-certs
               mountPath: /etc/certs
               readOnly: true
+            # - name: notary-auth
+            #   mountPath: /home/webhook/.notary
+            #   readOnly: true
             - name: logs
               mountPath: /tmp
           securityContext:
             readOnlyRootFilesystem: true
       volumes:
+        # - name: webhook-certs
+        #   secret:
+        #     secretName: notary-auth
         - name: webhook-certs
           secret:
             secretName: grumpy
         - name: logs
           emptyDir: {}
 ---
-apiVersion: admissionregistration.k8s.io/v1beta1
+apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
 metadata:
   name: grumpy
@@ -74,10 +90,12 @@ webhooks:
         name: grumpy
         namespace: default
         path: "/validate"
-      caBundle: "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUVERENDQXZRQ0NRQ1BUWjFjQUZWYjdUQU5CZ2txaGtpRzl3MEJBUTBGQURDQnh6RUxNQWtHQTFVRUJoTUMKUkVVeEVEQU9CZ05WQkFnTUIwTnZiRzluYm1VeEVEQU9CZ05WQkFjTUIwTnZiRzluYm1VeER6QU5CZ05WQkJFTQpCalF5TkRJME1qRVVNQklHQTFVRUNRd0xTR0ZzYkc4Z0lERTJNakV4RXpBUkJnTlZCQW9NQ21kcFlXNTBjM2RoCmNtMHhHVEFYQmdOVkJBc01FRVZ0YjJwNUlFUmxjR0Z5ZEcxbGJuUXhGakFVQmdOVkJBTU1EV2RwWVc1MGMzZGgKY20wdWFXOHhKVEFqQmdrcWhraUc5dzBCQ1FFV0ZtNXZMWEpsY0d4NVFHZHBZVzUwYzNkaGNtMHVhVzh3SGhjTgpNVGd4TURFNU1USXpOREl6V2hjTk1UZ3hNVEU0TVRJek5ESXpXakNCeHpFTE1Ba0dBMVVFQmhNQ1JFVXhFREFPCkJnTlZCQWdNQjBOdmJHOW5ibVV4RURBT0JnTlZCQWNNQjBOdmJHOW5ibVV4RHpBTkJnTlZCQkVNQmpReU5ESTAKTWpFVU1CSUdBMVVFQ1F3TFNHRnNiRzhnSURFMk1qRXhFekFSQmdOVkJBb01DbWRwWVc1MGMzZGhjbTB4R1RBWApCZ05WQkFzTUVFVnRiMnA1SUVSbGNHRnlkRzFsYm5ReEZqQVVCZ05WQkFNTURXZHBZVzUwYzNkaGNtMHVhVzh4CkpUQWpCZ2txaGtpRzl3MEJDUUVXRm01dkxYSmxjR3g1UUdkcFlXNTBjM2RoY20wdWFXOHdnZ0VpTUEwR0NTcUcKU0liM0RRRUJBUVVBQTRJQkR3QXdnZ0VLQW9JQkFRQ3A5NmIwa09QdWtTTUwrYmVEZlMrRTE4Tm9QYktYalZaWApGZEgxbUVKakhTeEZndmJHUlZiMnpmeTRxeS8vdkhCQ09Mb01YU01NMWFzdUxaY3VlRjdsK0F3TW1oUTRqd1FuClRRa1BZOUhKSHZVOW9XSC9OUXNPUWdHT0p3QlU2MVlEdVkzVG1iZEhlRWtmLzlIV0VwMElvRTRqeTlyMlBzbTQKR3ZoQmNOZHN3NjVpUnQ4UE5pZmpjRmRZd3ZFckxtNlNEcUpjazJGNkJiNTdFTGFiSmxYckw5NmxiRDY5bHM1TgpJUGlxZjNBZjlzRlpQR0ljeldHZ1pZbzdjTUU4OVhBYVBsRmpUK2NtU25QNHdKcExmd3E5aEc3U3NqUHY5TFduCkFuSEQrbXVETm9RWS9iaGNJR25KZjQ2MWloYjFhQTAwZFNCZHJWUmp5ZEoxOFgvdkZqTk5BZ01CQUFFd0RRWUoKS29aSWh2Y05BUUVOQlFBRGdnRUJBSGQ5NzhiQVhLZ01kTHVuYzJOYmNBTElISVpodEp3cjNQblU0TklqM0llbQpka2FQd3pNM3E5RHA3cmRqbDBnVk41SENuRHpCeHdQMlZPV3dxcDFYZVM5SWRkSlBpT0IyOXZ2d1ZENS9uaVp2Cjc3aVhUdjJHdSs1a2JqQnowd3htM3ducWlWMmtrVy9xaUdIVXVoUStBOUREMmJoUHl6Tk1QalZuTFJkb0FMMEcKeE0xWm5qaHlrZ05pY1JQNk5sNzErcG1qYmdReFJ5R0JVQ05xVzNpcDdOMU15ZGtsVGQwbzVGQmRtRXhsemQ3UgpHeFE3cDJJbHRUUXhEQjNLREZOKzl1ckUwL2VGUG5XNkF6RG0xbnErNHRKMlZ0bk1WV3VFcEtENmFvS0FnYVpSClFuK3czb1lRZUxERmtoVmdaZVNESlRtdTN4TGxrakV6a1ViOG1jOWhwc1U9Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K"
+      caBundle: "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURFVENDQWZtZ0F3SUJBZ0lKQUlIeEdZeitZaTdwTUEwR0NTcUdTSWIzRFFFQkN3VUFNQmN4RlRBVEJnTlYKQkFNTURHRmtiV2x6YzJsdmJsOWpZVEFnRncweU1qQXhNRFV4TmpJNE16WmFHQTh5TWprMU1UQXlNVEUyTWpnegpObG93SFRFYk1Ca0dBMVVFQXd3U1ozSjFiWEI1TG1SbFptRjFiSFF1YzNaak1JSUJJakFOQmdrcWhraUc5dzBCCkFRRUZBQU9DQVE4QU1JSUJDZ0tDQVFFQTNoaTQ4Z05ZaVJsVmxvVkYvTHlLUkdoa3lCcllKZGI5bG5XWXpIQlEKVUFmK0FJNThaUk8xWTVVS1ZMbVdMR3BZRVVRd3RHMWw4SDhsTlliQWl6eldCVTRrbjNway82T3draUYzdmxyUgpuSnNsTWw5NURJK0o1YTNXZCtaSDRZT1RBbU85dzU0R0o5N3hqWFh4RVpwK0lHUFg0RFcxb0w5dlJWTEcrQTF5ClQvK0RMVU1UbzU5R2xkN0hKaDRoelNOUThSWlRDZ2F1VXY5ZWhCM1N6MFd6akova1pjRUQ0NG1aZVVjbzVocmwKdGhBR2hEd0JpMFR2ZmpSMjhXREtYZG04NW5OdnF5MWQ0YTZVVFJ6V1duTlRxUjNCU3plZlFnd0NjNHMrbnVlbgpGZ2ovYW5kTmVzZTdteDd0Q3YrdFA0eDlSM1NHNi9KWTdjaXJjd0xrYWJxb2V3SURBUUFCbzFnd1ZqQUpCZ05WCkhSTUVBakFBTUFzR0ExVWREd1FFQXdJRjREQWRCZ05WSFNVRUZqQVVCZ2dyQmdFRkJRY0RBZ1lJS3dZQkJRVUgKQXdFd0hRWURWUjBSQkJZd0ZJSVNaM0oxYlhCNUxtUmxabUYxYkhRdWMzWmpNQTBHQ1NxR1NJYjNEUUVCQ3dVQQpBNElCQVFCSlF5YXNsSGUwMWJTS053SllYN2dyWlRRWmlJZXA5MXUzeWdFOVEzYVR2OTNvUkxLSUpIRlpLWXpxCmhueStWdG1LV2dPWlVraEkzNUVkeFhTanNTSEZ4U09BL25WT1BqWTlMaFA1WUV4RnFyd3Zibi9BVml6aDUxWXUKZTZtSzVVTnB6L3g2LzZhQWt1Mzlyc2tPb0l4cWVhbGVRSHFkV3lqSlRWU282cWk0RldZZDNrTy9taitkdWhJVgpVOFIvd3dHY1pxQVEwYWF6aHJwSElocE9LNEZVUFVITHRKbW14Z1hBR2psNnNGUzBTeFFFRkEzS2tkZFhHYVNJCldLTmJ1MzI2d0M5NVlHRmhyTjZDYlQxZVhYYzBFRjZ4N2pMZFV0aGREd0dZcjZWMWcrT2ZocUFhd2RZWFpRLysKVkFpS3RwMGQwZkVscXJiMnR1TEs5dGlsandHUwotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg=="
     rules:
       - operations: ["CREATE","UPDATE"]
         apiGroups: [""]
         apiVersions: ["v1"]
         resources: ["pods"]
     failurePolicy: Ignore
+    admissionReviewVersions: ["v1", "v1beta1"]
+    sideEffects: None

@@ -54,10 +54,10 @@ spec:
           resources:
             limits:
               memory: 50Mi
-              cpu: 300m
+              # cpu: 300m
             requests:
               memory: 00Mi
-              cpu: 300m
+              # cpu: 300m
           volumeMounts:
             - name: webhook-certs
               mountPath: /etc/certs
@@ -79,7 +79,7 @@ spec:
         - name: logs
           emptyDir: {}
 ---
-apiVersion: admissionregistration.k8s.io/v1beta1
+apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
 metadata:
   name: grumpy
@@ -97,3 +97,5 @@ webhooks:
         apiVersions: ["v1"]
         resources: ["pods"]
     failurePolicy: Ignore
+    admissionReviewVersions: ["v1", "v1beta1"]
+    sideEffects: None
