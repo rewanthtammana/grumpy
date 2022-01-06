@@ -85,7 +85,7 @@ kind: ValidatingWebhookConfiguration
 metadata:
   name: grumpy
 webhooks:
-  - name: grumpy.pipo02mix.org
+  - name: imagevalidator
     clientConfig:
       service:
         name: grumpy
