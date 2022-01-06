@@ -1,5 +1,5 @@
-# docker build . -t rewanthtammana/grumpy
-# docker push rewanthtammana/grumpy
+# docker build . -t rewanthtammana/grumpy:cosign
+# docker push rewanthtammana/grumpy:cosign
 
 kubectl delete secret grumpy
 
@@ -11,4 +11,3 @@ kubectl create secret generic grumpy -n default \
 
 kubectl apply -f manifest.yaml
 
-# Copy notary certificates!

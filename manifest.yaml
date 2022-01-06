@@ -43,7 +43,8 @@ spec:
     spec:
       containers:
         - name: webhook
-          image: rewanthtammana/grumpy:nonscratch
+          image: testinguser883/practice:cosign
+          # image: rewanthtammana/grumpy:nonscratch
           # image: pipo02mix/grumpy:1.0.0
           imagePullPolicy: Always
           args:
@@ -67,8 +68,8 @@ spec:
             #   readOnly: true
             - name: logs
               mountPath: /tmp
-          securityContext:
-            readOnlyRootFilesystem: true
+          # securityContext:
+          #   readOnlyRootFilesystem: true
       volumes:
         # - name: webhook-certs
         #   secret:
