@@ -22,6 +22,12 @@ spec:
 # metadata:
 #   creationTimestamp: null
 #   name: notary-auth
+apiVersion: v1
+data:
+  key: YWJjZA==
+kind: Secret
+metadata:
+  name: public
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -63,13 +69,17 @@ spec:
             - name: webhook-certs
               mountPath: /etc/certs
               readOnly: true
+            - name: cosign
+              mountPath: /etc/cosign/key
+              subPath: key
+              readOnly: true
             # - name: notary-auth
             #   mountPath: /home/webhook/.notary
             #   readOnly: true
             - name: logs
               mountPath: /tmp
-          # securityContext:
-          #   readOnlyRootFilesystem: true
+          securityContext:
+            readOnlyRootFilesystem: true
       volumes:
         # - name: webhook-certs
         #   secret:
@@ -77,6 +87,9 @@ spec:
         - name: webhook-certs
           secret:
             secretName: grumpy
+        - name: cosign
+          secret:
+            secretName: public
         - name: logs
           emptyDir: {}
 ---
@@ -85,7 +98,7 @@ kind: ValidatingWebhookConfiguration
 metadata:
   name: grumpy
 webhooks:
-  - name: imagevalidator
+  - name: image.validator.grumpy
     clientConfig:
       service:
         name: grumpy

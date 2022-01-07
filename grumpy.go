@@ -59,7 +59,8 @@ func (gs *GrumpyServerHandler) serve(w http.ResponseWriter, r *http.Request) {
 	subcommand := "verify"
 	arg0 := "--key"
 	// Replace with env variable
-	arg1 := "cosign.pub"
+	// arg1 := "cosign.pub"
+	arg1 := "/etc/cosign/key"
 	arg2 := "--allow-insecure-registry"
 
 	for i := 0; i < len(pod.Spec.Containers); i++ {
@@ -67,6 +68,12 @@ func (gs *GrumpyServerHandler) serve(w http.ResponseWriter, r *http.Request) {
 
 		cmd := exec.Command(app, subcommand, arg0, arg1, arg2, imageName)
 		stdout, err := cmd.Output()
+
+		// https://hub.docker.com/v2/repositories/rewanthtammana/python/tags
+		// curl -s -H "Authorization: JWT ${TOKEN}" https://hub.docker.com/v2/repositories/rewanthtammana/python/tags -> images.digest
+		// Nexus Creds, Cosign pub
+
+		glog.Infof("Check it out = %s\n", stdout)
 
 		if err != nil || len(stdout) == 0 {
 			glog.Errorf("No signing information found for image = %s; Error message: %v", imageName, err)
