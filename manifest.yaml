@@ -49,7 +49,8 @@ spec:
     spec:
       containers:
         - name: webhook
-          image: testinguser883/practice:cosign
+          image: rewanthtammana/test:cosign
+          # image: testinguser883/practice:cosign
           # image: rewanthtammana/grumpy:nonscratch
           # image: pipo02mix/grumpy:1.0.0
           imagePullPolicy: Always
