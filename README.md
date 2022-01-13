@@ -4,7 +4,7 @@ This code allows to use cosign with validating admission controllers for verifyi
 
 ## Build from scratch
 
-1. Build the docker image from scratch `docker build . -t $IMAGENAME && docker push $IMAGENAME` or use `rewanthtammana/grumpy:cosign`
+1. Build the docker image from scratch `docker build . -t $IMAGENAME && docker push $IMAGENAME` or use `rewanthtammana/test:cosign`
 2. Generate certificates & perform deployments with, `./deploy.sh`
 3. Check the status
 4. I have already signed an image & pushed it to my dockerhub. For validation run,
