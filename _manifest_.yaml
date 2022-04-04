@@ -13,7 +13,7 @@ spec:
     targetPort: 8080
   selector:
     name: grumpy 
-# ---
+---
 # apiVersion: v1
 # data:
 #   ca.crt: <BASE64>
@@ -24,7 +24,7 @@ spec:
 #   name: notary-auth
 apiVersion: v1
 data:
-  key: YWJjZA==
+  key: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFK2tJMW9qeFNpTDVzV05EeUpabXdPTndESWVIegpoS2VERmwzQktCRmNQcTRxcHJtMTl5R2I0T3JqNEJ3K29IdE1jNC9HUXNEVHBTVkhWM1ZWam1PVXFRPT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg==
 kind: Secret
 metadata:
   name: public
